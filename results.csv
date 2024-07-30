@@ -1,0 +1,6 @@
+Matrix Dimension, Algorithm, Average Runtime (microseconds)
+10, Square Matrix Multiply, 32
+20, Square Matrix Multiply, 142
+30, Square Matrix Multiply, 440
+40, Square Matrix Multiply, 6186
+50, Square Matrix Multiply, 4754

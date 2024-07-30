@@ -1,7 +1,10 @@
 #include <iostream>
 #include <random>
+#include <chrono>
+#include <fstream>
 
 using namespace std;
+using namespace chrono;
 
 vector<vector<int>> generateRandomMatrix(int n) {
     vector<vector<int>> matrix(n, vector<int>(n));
@@ -26,6 +29,7 @@ void printMatrix(const vector<vector<int>>& matrix) {
     cout << endl;
 }
 
+//square matrix multiplication between matrix A and B
 vector<vector<int>> squareMatrixMultiply(vector<vector<int>> A, vector<vector<int>> B){
     int n = A.size();
     vector<vector<int>> C(n, vector<int>(n));
@@ -41,12 +45,30 @@ vector<vector<int>> squareMatrixMultiply(vector<vector<int>> A, vector<vector<in
 }
 
 int main(){
-    int n = 3;
-    vector<vector<int>> A = generateRandomMatrix(n);
-    printMatrix(A);
-    vector<vector<int>> B = generateRandomMatrix(n);
-    printMatrix(B);
-    squareMatrixMultiply(A, B);
-    printMatrix(squareMatrixMultiply(A,B));
+    vector<int> dimensions = {10, 20, 30, 40, 50};  // Example dimensions
+    int numTests = 5;  // Number of random matrices to average over
+
+    ofstream file("results.csv");
+    file << "Matrix Dimension, Algorithm, Average Runtime (microseconds)" << endl;
+    for (int n : dimensions) {
+        long totalTime = 0.0;
+
+        for (int i = 0; i < numTests; ++i) {
+            vector<vector<int>> A = generateRandomMatrix(n);
+            vector<vector<int>> B = generateRandomMatrix(n);
+
+            auto start_time = high_resolution_clock::now();
+            vector<vector<int>> C = squareMatrixMultiply(A, B);
+            auto end_time = high_resolution_clock::now();
+
+            auto duration = duration_cast<microseconds>(end_time - start_time).count();
+            totalTime += duration;
+        }
+
+        double averageRuntime = totalTime / numTests;
+        file << n << ", Square Matrix Multiply, " << averageRuntime << endl;
+    }
+
+    file.close();
     return 0;
 }
