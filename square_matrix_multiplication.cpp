@@ -44,7 +44,7 @@ vector<vector<int>> squareMatrixMultiply(vector<vector<int>> A, vector<vector<in
     return C;
 }
 
-vector<vector<int>> add(const vector<vector<int>> A, vector<vector<int>> B) {
+vector<vector<int>> addMatrices(const vector<vector<int>> A, vector<vector<int>> B) {
     int n = A.size();
     vector<vector<int>> C(n, vector<int>(n, 0));
     for (int i = 0; i < n; ++i) {
@@ -55,7 +55,7 @@ vector<vector<int>> add(const vector<vector<int>> A, vector<vector<int>> B) {
     return C;
 }
 
-vector<vector<int>> subtract(vector<vector<int>> A, vector<vector<int>> B) {
+vector<vector<int>> subtractMatrices(vector<vector<int>> A, vector<vector<int>> B) {
     int n = A.size();
     vector<vector<int>> C(n, vector<int>(n, 0));
     for (int i = 0; i < n; ++i) {
@@ -95,10 +95,10 @@ vector<vector<int>> squareMatrixMultiplyRecursive(vector<vector<int>> A, vector<
             }
         }
 
-        vector<vector<int>> C11 = add(squareMatrixMultiplyRecursive(A11, B11), squareMatrixMultiplyRecursive(A12, B21));
-        vector<vector<int>> C12 = add(squareMatrixMultiplyRecursive(A11, B12), squareMatrixMultiplyRecursive(A12, B22));
-        vector<vector<int>> C21 = add(squareMatrixMultiplyRecursive(A21, B11), squareMatrixMultiplyRecursive(A22, B21));
-        vector<vector<int>> C22 = add(squareMatrixMultiplyRecursive(A21, B12), squareMatrixMultiplyRecursive(A22, B22));
+        vector<vector<int>> C11 = addMatrices(squareMatrixMultiplyRecursive(A11, B11), squareMatrixMultiplyRecursive(A12, B21));
+        vector<vector<int>> C12 = addMatrices(squareMatrixMultiplyRecursive(A11, B12), squareMatrixMultiplyRecursive(A12, B22));
+        vector<vector<int>> C21 = addMatrices(squareMatrixMultiplyRecursive(A21, B11), squareMatrixMultiplyRecursive(A22, B21));
+        vector<vector<int>> C22 = addMatrices(squareMatrixMultiplyRecursive(A21, B12), squareMatrixMultiplyRecursive(A22, B22));
 
         for (int i = 0; i < newSize; ++i) {
             for (int j = 0; j < newSize; ++j) {
@@ -133,6 +133,80 @@ vector<vector<int>> unpadMatrix(vector<vector<int>> A, int originalSize) {
     return unpadded;
 } 
 
+vector<vector<int>> strassen(vector<vector<int>> A, vector<vector<int>> B) {
+    int n = A.size();
+    vector<vector<int>> C(n, vector<int>(n, 0));
+
+    // Base case: single element matrix
+    if (n == 1) {
+        C[0][0] = A[0][0] * B[0][0];
+    } else {
+        int newSize = n / 2;
+
+        // Submatrices
+        vector<vector<int>> A11(newSize, vector<int>(newSize, 0));
+        vector<vector<int>> A12(newSize, vector<int>(newSize, 0));
+        vector<vector<int>> A21(newSize, vector<int>(newSize, 0));
+        vector<vector<int>> A22(newSize, vector<int>(newSize, 0));
+        vector<vector<int>> B11(newSize, vector<int>(newSize, 0));
+        vector<vector<int>> B12(newSize, vector<int>(newSize, 0));
+        vector<vector<int>> B21(newSize, vector<int>(newSize, 0));
+        vector<vector<int>> B22(newSize, vector<int>(newSize, 0));
+
+        // Splitting A and B matrices into submatrices
+        for (int i = 0; i < newSize; ++i) {
+            for (int j = 0; j < newSize; ++j) {
+                A11[i][j] = A[i][j];
+                A12[i][j] = A[i][j + newSize];
+                A21[i][j] = A[i + newSize][j];
+                A22[i][j] = A[i + newSize][j + newSize];
+                B11[i][j] = B[i][j];
+                B12[i][j] = B[i][j + newSize];
+                B21[i][j] = B[i + newSize][j];
+                B22[i][j] = B[i + newSize][j + newSize];
+            }
+        }
+
+        // Calculating S1 to S10
+        vector<vector<int>> S1 = subtractMatrices(B12, B22);
+        vector<vector<int>> S2 = addMatrices(A11, A12);
+        vector<vector<int>> S3 = addMatrices(A21, A22);
+        vector<vector<int>> S4 = subtractMatrices(B21, B11);
+        vector<vector<int>> S5 = addMatrices(A11, A22);
+        vector<vector<int>> S6 = addMatrices(B11, B22);
+        vector<vector<int>> S7 = subtractMatrices(A12, A22);
+        vector<vector<int>> S8 = addMatrices(B21, B22);
+        vector<vector<int>> S9 = subtractMatrices(A11, A21);
+        vector<vector<int>> S10 = addMatrices(B11, B12);
+
+        // Calculating P1 to P7
+        vector<vector<int>> P1 = strassen(A11, S1);
+        vector<vector<int>> P2 = strassen(S2, B22);
+        vector<vector<int>> P3 = strassen(S3, B11);
+        vector<vector<int>> P4 = strassen(A22, S4);
+        vector<vector<int>> P5 = strassen(S5, S6);
+        vector<vector<int>> P6 = strassen(S7, S8);
+        vector<vector<int>> P7 = strassen(S9, S10);
+
+        // Calculating C11, C12, C21, C22
+        vector<vector<int>> C11 = addMatrices(subtractMatrices(addMatrices(P5, P4), P2), P6);
+        vector<vector<int>> C12 = addMatrices(P1, P2);
+        vector<vector<int>> C21 = addMatrices(P3, P4);
+        vector<vector<int>> C22 = subtractMatrices(subtractMatrices(addMatrices(P5, P1), P3), P7);
+
+        // Combining the submatrices into the final result matrix C
+        for (int i = 0; i < newSize; ++i) {
+            for (int j = 0; j < newSize; ++j) {
+                C[i][j] = C11[i][j];
+                C[i][j + newSize] = C12[i][j];
+                C[i + newSize][j] = C21[i][j];
+                C[i + newSize][j + newSize] = C22[i][j];
+            }
+        }
+    }
+    return C;
+}
+
 int main(){
     vector<int> dimensions = {10, 20, 30, 40, 50};  // Example dimensions
     int numTests = 1;  // Number of random matrices to average over
@@ -166,7 +240,7 @@ int main(){
     vector<vector<int>> paddedA = (newSize == 3) ? A : padMatrix(A, newSize);
     vector<vector<int>> paddedB = (newSize == 3) ? B : padMatrix(B, newSize);
     vector<vector<int>> C = squareMatrixMultiply(A, B);
-    vector<vector<int>> D = squareMatrixMultiplyRecursive(paddedA, paddedB);
+    vector<vector<int>> D = strassen(paddedA, paddedB);
     vector<vector<int>> Dunpadded = (newSize == 3) ? D : unpadMatrix(D, 3);
     printMatrix(A);
     printMatrix(B);
