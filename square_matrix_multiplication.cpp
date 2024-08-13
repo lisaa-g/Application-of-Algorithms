@@ -11,7 +11,7 @@ vector<vector<int>> generateRandomMatrix(int n) {
     //fill the matrix with random values
     for (int i = 0; i < n; ++i) {
         for (int j = 0; j < n; ++j) {
-            matrix[i][j] = rand() % 10; //random values between 0 and 99
+            matrix[i][j] = rand() % 100; //random values between 0 and 99
         }
     }
 
@@ -30,7 +30,7 @@ void printMatrix(const vector<vector<int>>& matrix) {
 }
 
 //square matrix multiplication between matrix A and B
-vector<vector<int>> squareMatrixMultiply(vector<vector<int>> A, vector<vector<int>> B){
+vector<vector<int>> squareMatrixMultiply(const vector<vector<int>>& A, const vector<vector<int>>& B){
     int n = A.size();
     vector<vector<int>> C(n, vector<int>(n));
     for (int i=0; i<n; i++){
@@ -57,7 +57,7 @@ vector<vector<int>> add(const vector<vector<int>> A, vector<vector<int>> B) {
 }
 
 //subtraction between matrix A and B
-vector<vector<int>> subtract(vector<vector<int>> A, vector<vector<int>> B) {
+vector<vector<int>> subtract(const vector<vector<int>>& A, const vector<vector<int>>& B) {
     int n = A.size();
     vector<vector<int>> C(n, vector<int>(n, 0));
     for (int i = 0; i < n; ++i) {
@@ -69,7 +69,7 @@ vector<vector<int>> subtract(vector<vector<int>> A, vector<vector<int>> B) {
 }
 
 //recursive square matrix multiplication between matrix A and B
-vector<vector<int>> squareMatrixMultiplyRecursive(vector<vector<int>> A, vector<vector<int>> B) {
+vector<vector<int>> squareMatrixMultiplyRecursive(const vector<vector<int>>& A, const vector<vector<int>>& B) {
     int n = A.size();
     vector<vector<int>> C(n, vector<int>(n, 0));
     if (n == 1) {
@@ -116,7 +116,7 @@ vector<vector<int>> squareMatrixMultiplyRecursive(vector<vector<int>> A, vector<
 }
 
 //pads matrix with zeroes to make it a matrix with size of power of 2
-vector<vector<int>> padMatrix(vector<vector<int>> A, int newSize) {
+vector<vector<int>> padMatrix(const vector<vector<int>>& A, int newSize) {
     int oldSize = A.size();
     vector<vector<int>> padded(newSize, vector<int>(newSize, 0));
     for (int i = 0; i < oldSize; ++i) {
@@ -128,7 +128,7 @@ vector<vector<int>> padMatrix(vector<vector<int>> A, int newSize) {
 }
 
 //unpads matrix so it is its original size
-vector<vector<int>> unpadMatrix(vector<vector<int>> A, int originalSize) {
+vector<vector<int>> unpadMatrix(const vector<vector<int>>& A, int originalSize) {
     vector<vector<int>> unpadded(originalSize, vector<int>(originalSize));
     for (int i = 0; i < originalSize; ++i) {
         for (int j = 0; j < originalSize; ++j) {
@@ -139,114 +139,112 @@ vector<vector<int>> unpadMatrix(vector<vector<int>> A, int originalSize) {
 } 
 
 //strassens method of square matrix multiplication between matrix A and B
-vector<vector<int>> strassen(vector<vector<int>> A, vector<vector<int>> B) {
+vector<vector<int>> strassen(const vector<vector<int>>& A, const vector<vector<int>>& B) {
     int n = A.size();
-    vector<vector<int>> C(n, vector<int>(n, 0));
     if (n == 1) {
-        C[0][0] = A[0][0] * B[0][0];
-    } else {
-        int newSize = n / 2;
-        vector<vector<int>> A11(newSize, vector<int>(newSize, 0));
-        vector<vector<int>> A12(newSize, vector<int>(newSize, 0));
-        vector<vector<int>> A21(newSize, vector<int>(newSize, 0));
-        vector<vector<int>> A22(newSize, vector<int>(newSize, 0));
-        vector<vector<int>> B11(newSize, vector<int>(newSize, 0));
-        vector<vector<int>> B12(newSize, vector<int>(newSize, 0));
-        vector<vector<int>> B21(newSize, vector<int>(newSize, 0));
-        vector<vector<int>> B22(newSize, vector<int>(newSize, 0));
+        return {{A[0][0] * B[0][0]}};
+    }
 
-        for (int i = 0; i < newSize; ++i) {
-            for (int j = 0; j < newSize; ++j) {
-                A11[i][j] = A[i][j];
-                A12[i][j] = A[i][j + newSize];
-                A21[i][j] = A[i + newSize][j];
-                A22[i][j] = A[i + newSize][j + newSize];
-                B11[i][j] = B[i][j];
-                B12[i][j] = B[i][j + newSize];
-                B21[i][j] = B[i + newSize][j];
-                B22[i][j] = B[i + newSize][j + newSize];
-            }
-        }
+    int newSize = n / 2;
+    vector<vector<int>> A11(newSize, vector<int>(newSize, 0));
+    vector<vector<int>> A12(newSize, vector<int>(newSize, 0));
+    vector<vector<int>> A21(newSize, vector<int>(newSize, 0));
+    vector<vector<int>> A22(newSize, vector<int>(newSize, 0));
+    vector<vector<int>> B11(newSize, vector<int>(newSize, 0));
+    vector<vector<int>> B12(newSize, vector<int>(newSize, 0));
+    vector<vector<int>> B21(newSize, vector<int>(newSize, 0));
+    vector<vector<int>> B22(newSize, vector<int>(newSize, 0));
 
-        //step 2
-        vector<vector<int>> S1 = subtract(B12, B22);
-        vector<vector<int>> S2 = add(A11, A12);
-        vector<vector<int>> S3 = add(A21, A22);
-        vector<vector<int>> S4 = subtract(B21, B11);
-        vector<vector<int>> S5 = add(A11, A22);
-        vector<vector<int>> S6 = add(B11, B22);
-        vector<vector<int>> S7 = subtract(A12, A22);
-        vector<vector<int>> S8 = add(B21, B22);
-        vector<vector<int>> S9 = subtract(A11, A21);
-        vector<vector<int>> S10 = add(B11, B12);
-
-        //step 3
-        vector<vector<int>> P1 = strassen(A11, S1);
-        vector<vector<int>> P2 = strassen(S2, B22);
-        vector<vector<int>> P3 = strassen(S3, B11);
-        vector<vector<int>> P4 = strassen(A22, S4);
-        vector<vector<int>> P5 = strassen(S5, S6);
-        vector<vector<int>> P6 = strassen(S7, S8);
-        vector<vector<int>> P7 = strassen(S9, S10);
-
-        //step 3
-        vector<vector<int>> C11 = add(subtract(add(P5, P4), P2), P6);
-        vector<vector<int>> C12 = add(P1, P2);
-        vector<vector<int>> C21 = add(P3, P4);
-        vector<vector<int>> C22 = subtract(subtract(add(P5, P1), P3), P7);
-
-        for (int i = 0; i < newSize; ++i) {
-            for (int j = 0; j < newSize; ++j) {
-                C[i][j] = C11[i][j];
-                C[i][j + newSize] = C12[i][j];
-                C[i + newSize][j] = C21[i][j];
-                C[i + newSize][j + newSize] = C22[i][j];
-            }
+    //dividing the matrices into quadrants
+    for (int i = 0; i < newSize; ++i) {
+        for (int j = 0; j < newSize; ++j) {
+            A11[i][j] = A[i][j];
+            A12[i][j] = A[i][j + newSize];
+            A21[i][j] = A[i + newSize][j];
+            A22[i][j] = A[i + newSize][j + newSize];
+            B11[i][j] = B[i][j];
+            B12[i][j] = B[i][j + newSize];
+            B21[i][j] = B[i + newSize][j];
+            B22[i][j] = B[i + newSize][j + newSize];
         }
     }
+
+    //calculating the seven products, using the Strassen algorithm
+    vector<vector<int>> P1 = strassen(add(A11, A22), add(B11, B22));
+    vector<vector<int>> P2 = strassen(add(A21, A22), B11);
+    vector<vector<int>> P3 = strassen(A11, subtract(B12, B22));
+    vector<vector<int>> P4 = strassen(A22, subtract(B21, B11));
+    vector<vector<int>> P5 = strassen(add(A11, A12), B22);
+    vector<vector<int>> P6 = strassen(subtract(A21, A11), add(B11, B12));
+    vector<vector<int>> P7 = strassen(subtract(A12, A22), add(B21, B22));
+
+    //calculating C quadrants
+    vector<vector<int>> C11 = add(subtract(add(P1, P4), P5), P7); //C11 = M1 + M4 - M5 + M7
+    vector<vector<int>> C12 = add(P3, P5); //C12 = M3 + M5
+    vector<vector<int>> C21 = add(P2, P4); //C21 = M2 + M4
+    vector<vector<int>> C22 = add(subtract(add(P1, P3), P2), P6); //C22 = M1 + M3 - M2 + M6
+
+    //combining the results into a single matrix
+    vector<vector<int>> C(n, vector<int>(n, 0));
+    for (int i = 0; i < newSize; ++i) {
+        for (int j = 0; j < newSize; ++j) {
+            C[i][j] = C11[i][j];
+            C[i][j + newSize] = C12[i][j];
+            C[i + newSize][j] = C21[i][j];
+            C[i + newSize][j + newSize] = C22[i][j];
+        }
+    }
+
     return C;
 }
 
 int main(){
-    vector<int> dimensions = {10, 20, 30, 40, 50};  // Example dimensions
-    int numTests = 1;  // Number of random matrices to average over
+    vector<int> dimensions = {12, 45, 69, 101, 154, 203, 317, 420, 487, 556, 678, 721, 889, 912, 1000, 1011, 1176, 1298, 1425, 1553, 1682, 1799, 1818, 1907, 2045};
+    int numTests = 3; 
 
     ofstream file("results.csv");
-    file << "Matrix Dimension, Algorithm, Average Runtime (microseconds)" << endl;
+    file << "Matrix Dimension, Normal SMM, Recursive SMM, Strassen SMM" << endl;
 
-    int newSize = pow(2, ceil(log2(3)));
+    for (int n : dimensions) {
+        int newSize = pow(2, ceil(log2(n)));
 
-    // for (int n : dimensions) {
-    //     long totalTime = 0.0;
+        double SMMTime = 0.0;
+        double recursiveSMMTime = 0.0;
+        double strassenTime = 0.0;
 
-    //     for (int i = 0; i < numTests; ++i) {
-    //         vector<vector<int>> A = generateRandomMatrix(n);
-    //         vector<vector<int>> B = generateRandomMatrix(n);
+        for (int i = 0; i < numTests; ++i) {
+            vector<vector<int>> A = generateRandomMatrix(n);
+            vector<vector<int>> B = generateRandomMatrix(n);
 
-    //         auto start_time = high_resolution_clock::now();
-    //         vector<vector<int>> C = squareMatrixMultiply(A, B);
-    //         auto end_time = high_resolution_clock::now();
+            auto start_time = high_resolution_clock::now();
+            vector<vector<int>> C = squareMatrixMultiply(A, B);
+            auto end_time = high_resolution_clock::now();
+            double duration = duration_cast<microseconds>(end_time - start_time).count() / 1000000.0;
+            SMMTime += duration;
 
-    //         auto duration = duration_cast<microseconds>(end_time - start_time).count();
-    //         totalTime += duration;
-    //     }
+            vector<vector<int>> paddedA = (newSize == n) ? A : padMatrix(A, newSize);
+            vector<vector<int>> paddedB = (newSize == n) ? B : padMatrix(B, newSize);
 
-    //     double averageRuntime = totalTime / numTests;
-    //     file << n << ", Square Matrix Multiply, " << averageRuntime << endl;
-    // }
+            start_time = high_resolution_clock::now();
+            vector<vector<int>> D = squareMatrixMultiplyRecursive(paddedA, paddedB);
+            end_time = high_resolution_clock::now();
+            duration = duration_cast<microseconds>(end_time - start_time).count() / 1000000.0;
+            recursiveSMMTime += duration;
 
-    vector<vector<int>> A = generateRandomMatrix(3);
-    vector<vector<int>> B = generateRandomMatrix(3);
-    vector<vector<int>> paddedA = (newSize == 3) ? A : padMatrix(A, newSize);
-    vector<vector<int>> paddedB = (newSize == 3) ? B : padMatrix(B, newSize);
-    vector<vector<int>> C = squareMatrixMultiply(A, B);
-    vector<vector<int>> D = strassen(paddedA, paddedB);
-    vector<vector<int>> Dunpadded = (newSize == 3) ? D : unpadMatrix(D, 3);
-    printMatrix(A);
-    printMatrix(B);
-    printMatrix(C);
-    printMatrix(D);
-    printMatrix(Dunpadded);
+            start_time = high_resolution_clock::now();
+            vector<vector<int>> E = strassen(paddedA, paddedB);
+            end_time = high_resolution_clock::now();
+            duration = duration_cast<microseconds>(end_time - start_time).count() / 1000000.0;
+            strassenTime += duration;
+
+        }
+
+        double averageSMMTime = SMMTime / numTests;
+        double averageRecursiveSMMTime = recursiveSMMTime / numTests;
+        double averageStrassenTime = strassenTime / numTests;
+
+        file << n << ", " << averageSMMTime << ", " << averageRecursiveSMMTime << ", " << averageStrassenTime << endl;
+    }
 
     file.close();
     return 0;
