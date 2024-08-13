@@ -1,4 +1,4 @@
-Matrix Dimension, Normal SMM, Recursive SMM, Strassen SMM
+Matrix Dimension, Classical SMM, Recursive SMM, Strassen SMM
 12, 5.53e-05, 0.0074317, 0.0063105
 45, 0.0006952, 0.236622, 0.279187
 69, 0.0024757, 1.95989, 1.91354
