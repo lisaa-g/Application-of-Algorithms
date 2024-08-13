@@ -202,8 +202,9 @@ int main(){
     vector<int> dimensions = {12, 45, 69, 101, 154, 203, 317, 420, 487, 556, 678, 721, 889, 912, 1000, 1011, 1176, 1298, 1425, 1553, 1682, 1799, 1818, 1907, 2045};
     int numTests = 3; 
 
+    //start of csv file
     ofstream file("results.csv");
-    file << "Matrix Dimension, Normal SMM, Recursive SMM, Strassen SMM" << endl;
+    file << "Matrix Dimension, Classic SMM, Recursive SMM, Strassen SMM" << endl;
 
     for (int n : dimensions) {
         int newSize = pow(2, ceil(log2(n)));
@@ -216,21 +217,25 @@ int main(){
             vector<vector<int>> A = generateRandomMatrix(n);
             vector<vector<int>> B = generateRandomMatrix(n);
 
+            //times how long it takes to do classical square matrix multiplication
             auto start_time = high_resolution_clock::now();
             vector<vector<int>> C = squareMatrixMultiply(A, B);
             auto end_time = high_resolution_clock::now();
             double duration = duration_cast<microseconds>(end_time - start_time).count() / 1000000.0;
             SMMTime += duration;
 
+            //pads matrices A and B for recursive and strassens
             vector<vector<int>> paddedA = (newSize == n) ? A : padMatrix(A, newSize);
             vector<vector<int>> paddedB = (newSize == n) ? B : padMatrix(B, newSize);
 
+            //times how long it takes to do recursive square matrix multiplication
             start_time = high_resolution_clock::now();
             vector<vector<int>> D = squareMatrixMultiplyRecursive(paddedA, paddedB);
             end_time = high_resolution_clock::now();
             duration = duration_cast<microseconds>(end_time - start_time).count() / 1000000.0;
             recursiveSMMTime += duration;
 
+            //times how long it takes to do strassens algorithm
             start_time = high_resolution_clock::now();
             vector<vector<int>> E = strassen(paddedA, paddedB);
             end_time = high_resolution_clock::now();
@@ -243,6 +248,7 @@ int main(){
         double averageRecursiveSMMTime = recursiveSMMTime / numTests;
         double averageStrassenTime = strassenTime / numTests;
 
+        //adds to the csv file
         file << n << ", " << averageSMMTime << ", " << averageRecursiveSMMTime << ", " << averageStrassenTime << endl;
     }
 
