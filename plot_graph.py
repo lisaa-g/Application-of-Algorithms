@@ -39,16 +39,3 @@ plt.title('Time Ratios vs Matrix Dimension (From 512x512 Onwards)')
 plt.legend()
 plt.grid(True)
 plt.show()
-
-#time ratios for classical vs strassen
-df_filtered.loc[:, 'Relative Performance Ratio'] = df_filtered['Classical SMM'] / df_filtered['Strassen SMM']
-
-#plot time ratios vs matrix dimension
-plt.figure(figsize=(10, 6))
-plt.plot(df_filtered['Matrix Dimension'], df_filtered['Relative Performance Ratio'], 'o-', label='Classical SMM / Strassen SMM Ratio', color="hotpink")
-plt.xlabel('Matrix Dimension')
-plt.ylabel('Relative Performance Ratio')
-plt.title('Relative Performance Ratio (Classical SMM / Strassen SMM) vs Matrix Dimension')
-plt.legend()
-plt.grid(True)
-plt.show()
