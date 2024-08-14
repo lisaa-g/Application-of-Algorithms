@@ -1,7 +1,7 @@
 import pandas as pd
 import matplotlib.pyplot as plt
 
-df = pd.read_csv('results.csv')
+df = pd.read_csv('Assignment 1/results.csv')
 df.columns = df.columns.str.strip()
 
 #Exclude rows where Recursive SMM is zero for Recursive SMM plotting
