@@ -9,43 +9,65 @@ using namespace chrono;
 struct Node {
     int key;
     Node* left;
-    Node* right;    
-    Node(int item) {
-        key = item;
-        left = NULL;
-        right = NULL;
+    Node* right;
+    Node* parent;
+
+    Node(int key) : key(key), left(nullptr), right(nullptr), parent(nullptr) {}
+};
+
+
+class BST {
+public:
+    Node* root;
+
+    BST() : root(nullptr) {}
+
+    // Tree-Insert: Insert key into the BST
+    void treeInsert(int key) {
+        Node* z = new Node(key);
+        Node* y = nullptr;
+        Node* x = root;
+
+        while (x != nullptr) {
+            y = x;
+            if (z->key < x->key)
+                x = x->left;
+            else
+                x = x->right;
+        }
+
+        z->parent = y;
+
+        if (y == nullptr) {
+            root = z;  // Tree was empty, new node becomes root
+        } else if (z->key < y->key) {
+            y->left = z;
+        } else {
+            y->right = z;
+        }
+    }
+
+    // In-order traversal (to verify the tree structure)
+    void inorder(Node* node) {
+        if (node != nullptr) {
+            inorder(node->left);
+            cout << node->key << " ";
+            inorder(node->right);
+        }
     }
 };
 
-void inorder(Node* root) {
-    if (root != NULL) {
-        inorder(root->left);
-        cout << root->key << " ";
-        inorder(root->right);
+//find the minimum node
+Node* treeMinimum(Node* x) {
+    while (x->left != nullptr) {
+        x = x->left;
     }
-}
-
-Node* insert(Node* node, int key) {
-    //tree is empty
-    if (node == NULL) 
-        return new Node(key);    
-    
-    //key is already in the tree
-    if (node->key == key) 
-        return node;
-    
-    //key being inserted is greater than the node's key -> insert it in the right subtree
-    if (node->key < key) 
-        node->right = insert(node->right, key);
-    //key being inserted is smaller than the node's key -> insert it in the left subtree
-    else 
-        node->left = insert(node->left, key);
-    return node;
+    return x;
 }
 
 int main(){
     Node* root = NULL;
-    vector<int> numbers;
+    vector<int> keys;
     int num = 10;
     int N = 100;
 
@@ -54,19 +76,26 @@ int main(){
     for (int i = 0; i < num; i++) {
         int randomNumber = rand() % N;
         cout << randomNumber << " ";
-        numbers.push_back(randomNumber);  // Store the number in the vector
+        keys.push_back(randomNumber);  // Store the number in the vector
     }
     cout << endl;
 
-    // Insert the random numbers into the BST
-    for (int number : numbers) {
-        root = insert(root, number);
+    BST tree;
+    for (int key : keys) {
+        tree.treeInsert(key); // Insert shuffled keys into the BST
     }
 
-    // Print the BST using inorder traversal
-    cout << "Inorder traversal of the BST: ";
-    inorder(root);
+    // Print the in-order traversal to verify the tree structure
+    cout << "In-order traversal of the tree: ";
+    tree.inorder(tree.root);
     cout << endl;
+
+    Node* minNode = treeMinimum(tree.root);
+    if (minNode != nullptr) {
+        cout << "The minimum key in the tree is: " << minNode->key << endl;
+    } else {
+        cout << "The tree is empty." << endl;
+    }
 
     return 0;
 }
