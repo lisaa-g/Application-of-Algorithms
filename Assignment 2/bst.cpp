@@ -120,22 +120,26 @@ int treeHeight(Node* node) {
 
 int main(){
     int n = 5;
-    
-    cout << "Testing with n = " << n << endl;
     vector<int> keys;
     for (int i = 0; i < n; i++) {
         keys.push_back(i + 1);
     }
 
     random_shuffle(keys.begin(), keys.end());
-
-    BST tree;
-    //insert shuffled keys into the BST
     for (int key : keys) {
-        tree.treeInsert(key); 
         cout << key << " ";
     }
     cout << endl;
+
+    auto start = chrono::high_resolution_clock::now(); // Start timer
+    BST tree;
+    for (int key : keys) {
+        tree.treeInsert(key);
+    }
+    auto end = chrono::high_resolution_clock::now(); // End timer
+
+    chrono::duration<double, micro> elapsed = end - start;
+    cout << "Time taken to build tree for n = " << n << ": " << elapsed.count() << " microseconds" << endl;
 
     int height = treeHeight(tree.root);
     cout << "Tree height for n = " << n << " is " << height << endl;
