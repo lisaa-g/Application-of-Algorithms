@@ -119,6 +119,7 @@ int treeHeight(Node* node) {
 }
 
 int main(){
+    srand(time(0));
     int n = 5;
     vector<int> keys;
     for (int i = 0; i < n; i++) {
@@ -137,7 +138,6 @@ int main(){
         tree.treeInsert(key);
     }
     auto end = chrono::high_resolution_clock::now(); // End timer
-
     chrono::duration<double, micro> elapsed = end - start;
     cout << "Time taken to build tree for n = " << n << ": " << elapsed.count() << " microseconds" << endl;
 
@@ -148,19 +148,15 @@ int main(){
     tree.inorder(tree.root);
     cout << endl;
 
-    int deleteKey = 3;
-    Node* nodeToDelete = search(tree.root, deleteKey);
-
-    if (nodeToDelete != nullptr) {
-        //delete the node
-        treeDelete(tree, nodeToDelete);
-        cout << "Node with key " << deleteKey << " deleted" << endl;
-    } else {
-        cout << "Node with key " << deleteKey << " not found" << endl;
+    start = chrono::high_resolution_clock::now(); // Start timer
+    while (tree.root != nullptr) {
+        treeDelete(tree, tree.root); // Delete the root node repeatedly
     }
+    end = chrono::high_resolution_clock::now(); // End timer
+    elapsed = end - start;
+    cout << "Time taken to destroy the tree: " << elapsed.count() << " microseconds" << endl;
 
-    // Print the in-order traversal again to check after deletion
-    cout << "In-order traversal of the tree after deletion: ";
+    cout << "In-order traversal of the tree: ";
     tree.inorder(tree.root);
     cout << endl;
 
