@@ -112,6 +112,12 @@ Node* search(Node* node, int key) {
     }
 }
 
+// Function to compute the height of the tree
+int treeHeight(Node* node) {
+    if (node == nullptr) return 0;
+    return 1 + max(treeHeight(node->left), treeHeight(node->right));
+}
+
 int main(){
     int n = 5;
     
@@ -127,7 +133,12 @@ int main(){
     //insert shuffled keys into the BST
     for (int key : keys) {
         tree.treeInsert(key); 
+        cout << key << " ";
     }
+    cout << endl;
+
+    int height = treeHeight(tree.root);
+    cout << "Tree height for n = " << n << " is " << height << endl;
 
     cout << "In-order traversal of the tree: ";
     tree.inorder(tree.root);
@@ -139,9 +150,9 @@ int main(){
     if (nodeToDelete != nullptr) {
         //delete the node
         treeDelete(tree, nodeToDelete);
-        cout << "Node with key " << deleteKey << " deleted." << endl;
+        cout << "Node with key " << deleteKey << " deleted" << endl;
     } else {
-        cout << "Node with key " << deleteKey << " not found!" << endl;
+        cout << "Node with key " << deleteKey << " not found" << endl;
     }
 
     // Print the in-order traversal again to check after deletion
