@@ -4,6 +4,7 @@
 #include <vector>
 #include <algorithm>
 #include <chrono>
+#include <fstream>  // For file operations
 
 using namespace std;
 using namespace chrono;
@@ -16,7 +17,6 @@ struct Node {
 
     Node(int key) : key(key), left(nullptr), right(nullptr), parent(nullptr) {}
 };
-
 
 class BST {
 public:
@@ -49,7 +49,7 @@ public:
         }
     }
 
-    //inorder walk
+    //in-order walk
     void inorder(Node* node) {
         if (node != nullptr) {
             inorder(node->left);
@@ -118,47 +118,59 @@ int treeHeight(Node* node) {
     return 1 + max(treeHeight(node->left), treeHeight(node->right));
 }
 
-int main(){
+int main() {
     srand(time(0));
-    int n = 5;
-    vector<int> keys;
-    for (int i = 0; i < n; i++) {
-        keys.push_back(i + 1);
+    int trials = 5;
+
+    // Open CSV file for writing results
+    ofstream file("bst_results.csv");
+    file << "n,average_build_time,average_destroy_time,average_height\n";
+
+    // Loop through every value from 1 to 10000
+    for (int n = 10; n <= 100000; n=n+10) {
+        double totalBuildTime = 0;
+        double totalDestroyTime = 0;
+        double totalHeight = 0;
+
+        for (int t = 0; t < trials; t++) {
+            vector<int> keys;
+            for (int i = 0; i < n; i++) {
+                keys.push_back(i + 1);
+            }
+
+            random_shuffle(keys.begin(), keys.end());
+
+            //measure time to build the tree
+            auto start = high_resolution_clock::now();
+            BST tree;
+            for (int key : keys) {
+                tree.treeInsert(key);
+            }
+            auto end = high_resolution_clock::now();
+            duration<double, micro> buildTime = end - start;
+            totalBuildTime += buildTime.count();
+
+            //measure tree height
+            int height = treeHeight(tree.root);
+            totalHeight += height;
+
+            //measure time to destroy the tree
+            start = high_resolution_clock::now();
+            while (tree.root != nullptr) {
+                treeDelete(tree, tree.root);  // Delete the root node repeatedly
+            }
+            end = high_resolution_clock::now();
+            duration<double, micro> destroyTime = end - start;
+            totalDestroyTime += destroyTime.count();
+        }
+
+        //write results to the CSV file
+        file << n << "," << (totalBuildTime / trials) << "," << (totalDestroyTime / trials) << "," << (totalHeight / trials) << "\n";
     }
 
-    random_shuffle(keys.begin(), keys.end());
-    for (int key : keys) {
-        cout << key << " ";
-    }
-    cout << endl;
-
-    auto start = chrono::high_resolution_clock::now(); // Start timer
-    BST tree;
-    for (int key : keys) {
-        tree.treeInsert(key);
-    }
-    auto end = chrono::high_resolution_clock::now(); // End timer
-    chrono::duration<double, micro> elapsed = end - start;
-    cout << "Time taken to build tree for n = " << n << ": " << elapsed.count() << " microseconds" << endl;
-
-    int height = treeHeight(tree.root);
-    cout << "Tree height for n = " << n << " is " << height << endl;
-
-    cout << "In-order traversal of the tree: ";
-    tree.inorder(tree.root);
-    cout << endl;
-
-    start = chrono::high_resolution_clock::now(); // Start timer
-    while (tree.root != nullptr) {
-        treeDelete(tree, tree.root); // Delete the root node repeatedly
-    }
-    end = chrono::high_resolution_clock::now(); // End timer
-    elapsed = end - start;
-    cout << "Time taken to destroy the tree: " << elapsed.count() << " microseconds" << endl;
-
-    cout << "In-order traversal of the tree: ";
-    tree.inorder(tree.root);
-    cout << endl;
+    file.close();
+    
+    cout << "Experiment completed and results saved to bst_results.csv" << endl;
 
     return 0;
 }
