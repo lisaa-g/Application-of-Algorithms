@@ -1,7 +1,9 @@
 #include <iostream>
-#include <random>
+#include <cstdlib>
+#include <ctime>
+#include <vector>
+#include <algorithm>
 #include <chrono>
-#include <fstream>
 
 using namespace std;
 using namespace chrono;
@@ -22,7 +24,7 @@ public:
 
     BST() : root(nullptr) {}
 
-    // Tree-Insert: Insert key into the BST
+    //insert key into the BST
     void treeInsert(int key) {
         Node* z = new Node(key);
         Node* y = nullptr;
@@ -39,7 +41,7 @@ public:
         z->parent = y;
 
         if (y == nullptr) {
-            root = z;  // Tree was empty, new node becomes root
+            root = z;  //tree is empty, new node becomes root
         } else if (z->key < y->key) {
             y->left = z;
         } else {
@@ -47,7 +49,7 @@ public:
         }
     }
 
-    // In-order traversal (to verify the tree structure)
+    //inorder walk
     void inorder(Node* node) {
         if (node != nullptr) {
             inorder(node->left);
@@ -65,37 +67,87 @@ Node* treeMinimum(Node* x) {
     return x;
 }
 
-int main(){
-    Node* root = NULL;
-    vector<int> keys;
-    int num = 10;
-    int N = 100;
-
-    // Generate random numbers and store them in the vector
-    cout << "Generated random numbers: ";
-    for (int i = 0; i < num; i++) {
-        int randomNumber = rand() % N;
-        cout << randomNumber << " ";
-        keys.push_back(randomNumber);  // Store the number in the vector
+//delete a node from the BST
+void transplant(BST& tree, Node* u, Node* v) {
+    if (u->parent == nullptr) {
+        tree.root = v;
+    } else if (u == u->parent->left) {
+        u->parent->left = v;
+    } else {
+        u->parent->right = v;
     }
-    cout << endl;
+    if (v != nullptr) {
+        v->parent = u->parent;
+    }
+}
+
+void treeDelete(BST& tree, Node* z) {
+    if (z->left == nullptr) {
+        transplant(tree, z, z->right);
+    } else if (z->right == nullptr) {
+        transplant(tree, z, z->left);
+    } else {
+        Node* y = treeMinimum(z->right);
+        if (y->parent != z) {
+            transplant(tree, y, y->right);
+            y->right = z->right;
+            y->right->parent = y;
+        }
+        transplant(tree, z, y);
+        y->left = z->left;
+        y->left->parent = y;
+    }
+    delete z;
+}
+
+// Find a node with a specific key in the tree
+Node* search(Node* node, int key) {
+    if (node == nullptr || node->key == key) {
+        return node;
+    }
+    if (key < node->key) {
+        return search(node->left, key);
+    } else {
+        return search(node->right, key);
+    }
+}
+
+int main(){
+    int n = 5;
+    
+    cout << "Testing with n = " << n << endl;
+    vector<int> keys;
+    for (int i = 0; i < n; i++) {
+        keys.push_back(i + 1);
+    }
+
+    random_shuffle(keys.begin(), keys.end());
 
     BST tree;
+    //insert shuffled keys into the BST
     for (int key : keys) {
-        tree.treeInsert(key); // Insert shuffled keys into the BST
+        tree.treeInsert(key); 
     }
 
-    // Print the in-order traversal to verify the tree structure
     cout << "In-order traversal of the tree: ";
     tree.inorder(tree.root);
     cout << endl;
 
-    Node* minNode = treeMinimum(tree.root);
-    if (minNode != nullptr) {
-        cout << "The minimum key in the tree is: " << minNode->key << endl;
+    int deleteKey = 3;
+    Node* nodeToDelete = search(tree.root, deleteKey);
+
+    if (nodeToDelete != nullptr) {
+        //delete the node
+        treeDelete(tree, nodeToDelete);
+        cout << "Node with key " << deleteKey << " deleted." << endl;
     } else {
-        cout << "The tree is empty." << endl;
+        cout << "Node with key " << deleteKey << " not found!" << endl;
     }
+
+    // Print the in-order traversal again to check after deletion
+    cout << "In-order traversal of the tree after deletion: ";
+    tree.inorder(tree.root);
+    cout << endl;
 
     return 0;
 }
