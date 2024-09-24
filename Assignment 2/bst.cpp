@@ -120,14 +120,16 @@ int treeHeight(Node* node) {
 
 int main() {
     srand(time(0));
-    int trials = 5;
+    int trials = 50;
 
     // Open CSV file for writing results
     ofstream file("bst_results.csv");
     file << "n,average_build_time,average_destroy_time,average_height\n";
 
-    // Loop through every value from 1 to 10000
-    for (int n = 10; n <= 100000; n=n+10) {
+    vector<int> ns = {10, 25, 50, 75, 100, 200, 300, 400, 500, 600, 700, 800, 900, 1000, 2000, 3000, 4000, 5000, 
+    6000, 7000, 8000, 9000, 10000, 20000, 30000, 40000, 50000, 60000, 70000, 80000, 90000, 100000};
+
+    for (int n : ns) {
         double totalBuildTime = 0;
         double totalDestroyTime = 0;
         double totalHeight = 0;
