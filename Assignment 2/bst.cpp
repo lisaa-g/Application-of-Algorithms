@@ -120,7 +120,7 @@ int treeHeight(Node* node) {
 
 int main() {
     srand(time(0));
-    int trials = 50;
+    int trials = 10;
 
     // Open CSV file for writing results
     ofstream file("bst_results.csv");
