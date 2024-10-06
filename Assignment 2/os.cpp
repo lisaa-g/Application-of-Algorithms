@@ -152,6 +152,10 @@ int main() {
     treeInsert(root, 12);
     treeInsert(root, 17);
     treeInsert(root, 25);
+
+    cout << "In-order traversal before insertS:\n";
+    inOrderTraversal(root);
+
     treeInsert(root, 16);
 
     cout << "In-order traversal after inserts:\n";
