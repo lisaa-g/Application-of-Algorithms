@@ -69,16 +69,16 @@ void transplant(Node*& root, Node* u, Node* v) {
 }
 
 void treeDelete(Node*& root, Node* z) {
-    Node* deletedNode = nullptr;
+    Node* c = nullptr;
     if (z->left == nullptr) {
         transplant(root, z, z->right);
-        deletedNode = z->parent;
+        c = z->parent;
     } else if (z->right == nullptr) {
         transplant(root, z, z->left);
-        deletedNode = z->parent; 
+        c = z->parent; 
     } else {
         Node* y = treeMinimum(z->right); 
-        deletedNode = (y->parent != z) ? y->parent : y; 
+        c = (y->parent != z) ? y->parent : y; 
 
         if (y->parent != z) {
             transplant(root, y, y->right);
@@ -93,19 +93,19 @@ void treeDelete(Node*& root, Node* z) {
     delete z;
 
     //update the sizes of nodes after deletion
-    while (deletedNode != nullptr) {
+    while (c != nullptr) {
         int newSize = 1;
-        if (deletedNode->left != nullptr) {
-            newSize += deletedNode->left->size;
+        if (c->left != nullptr) {
+            newSize += c->left->size;
         }
-        if (deletedNode->right != nullptr) {
-            newSize += deletedNode->right->size;
+        if (c->right != nullptr) {
+            newSize += c->right->size;
         }
-        if (newSize == deletedNode->size) {
+        if (newSize == c->size) {
             break; 
         }
-        deletedNode->size = newSize;
-        deletedNode = deletedNode->parent;
+        c->size = newSize;
+        c = c->parent;
     }
 }
 
