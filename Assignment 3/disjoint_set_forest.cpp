@@ -1,8 +1,10 @@
 #include <iostream>
+#include <chrono>
 #include <vector>
-#include <algorithm>
+#include <fstream>
 
 using namespace std;
+using namespace chrono;
 
 //node structure representing each element in the disjoint-set
 struct Node {
@@ -51,6 +53,34 @@ void printSetRepresentative(Node* x) {
     cout << "Representative of " << x->data << " is " << rep->data << endl;
 }
 
+// Function to record time for union and find operations
+void recordTime(int size, ofstream& csv_file) {
+    vector<Node*> nodes;
+    double totalTime = 0.0; // Variable to accumulate the total time
+    const int runs = 10; // Number of runs to average
+    
+    for (int run = 0; run < runs; ++run) {
+        auto start = high_resolution_clock::now();
+        //create n sets
+        for (int i = 1; i <= size; ++i) {
+            nodes.push_back(makeSet(i));
+        }
+
+        //union all sets with the first set
+        for (int i = 0; i < size - 1; i += 2) {
+            unionSets(nodes[i], nodes[i + 1]);
+        }
+        auto end = high_resolution_clock::now();
+        duration<double, micro> timeTaken = end - start;
+
+        totalTime += timeTaken.count();
+    }
+
+    // Calculate average time
+    double averageTime = totalTime / runs;
+    csv_file << size << "," << averageTime << "\n";
+}
+
 int main() {
     //creates sets
     Node* node1 = makeSet(1);
@@ -80,6 +110,17 @@ int main() {
     printSetRepresentative(node2);
     printSetRepresentative(node3);
     printSetRepresentative(node4);
+
+    int sizes[] = {100, 1000, 10000, 20000, 30000, 40000, 50000, 60000, 70000, 80000, 90000, 100000};
+
+    ofstream csv_file("partA2.csv");
+    csv_file << "Number of Sets,Time (microseconds)\n";
+
+    for (int size : sizes) {
+        recordTime(size, csv_file);
+    }
+
+    csv_file.close();
 
     return 0;
 }
