@@ -48,9 +48,48 @@ void link(Node* x, Node* y) {
     }
 }
 
+void link_for_printSet(Node* x, Node* y) {
+    if (x->rank > y->rank) {
+        y->parent = x; //dd ys tree to x
+        //link the sets circularly
+        Node* lastX = x; //last member of x's set
+        Node* firstY = y; //first member of y's set
+        while (lastX->next != x) {
+            lastX = lastX->next; //find the last member in x's set
+        }
+        lastX->next = firstY;
+        Node* lastY = firstY;
+        while (lastY->next != y) {
+            lastY = lastY->next;
+        }
+        lastY->next = x;
+    } else {
+        x->parent = y; //add x's tree to y
+        Node* lastY = y;
+        Node* firstX = x;
+        while (lastY->next != y) {
+            lastY = lastY->next;
+        }
+        lastY->next = firstX;
+        Node* lastX = firstX;
+        while (lastX->next != x) {
+            lastX = lastX->next;
+        }
+        lastX->next = y;
+        if (x->rank == y->rank) {
+            y->rank++; //increment y's rank if the ranks are equal
+        }
+    }
+}
+
+
 //union two sets by linking their representatives
 void unionSets(Node* x, Node* y) {
     link(findSet(x), findSet(y));
+}
+
+void unionSets_for_printSet(Node* x, Node* y) {
+    link_for_printSet(findSet(x), findSet(y));
 }
 
 //print the members of the set containing node x
@@ -109,17 +148,17 @@ int main() {
     printSet(node4);
 
     cout << "\nUnion of set 1 and set 2:" << endl;
-    unionSets(node1, node2);
+    unionSets_for_printSet(node1, node2);
     printSet(node1);
     printSet(node2);
 
-    cout << "\nUnion of set 1+2 and set 3:" << endl;
-    unionSets(node2, node3);
-    printSet(node2); 
-    printSet(node3);
+    cout << "\nUnion of set 3 and set 4:" << endl;
+    unionSets_for_printSet(node3, node4);
+    printSet(node3); 
+    printSet(node4);
 
-    cout << "\nUnion of set 1+2+3 and set 4:" << endl;
-    unionSets(node1, node4);
+    cout << "\nUnion of set 1+2 and set 3+4:" << endl;
+    unionSets_for_printSet(node1, node4);
     printSet(node1);
     printSet(node2);
     printSet(node3);
